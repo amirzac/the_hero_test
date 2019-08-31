@@ -62,12 +62,12 @@ class BattleManager
                 $this->hitDefender($this->calculateDamage());
             }
 
-            if ($this->attackerHasRapidStrike()) {
+            if ($this->attackerHasRapidStrike() && $this->defenderNotLucky()) {
                 $this->hitDefender($this->calculateDamage());
             }
 
-            $this->finishRound();
             $this->switchRoles();
+            $this->finishRound();
         }
 
         return $this->statisticDispatcher;
@@ -75,16 +75,12 @@ class BattleManager
 
     public function hitDefender(float $damage): void
     {
-        $ifDefenderNotLucky = !$this->chanceManager->hadChance($this->defender->getLuck());
+        $this->statisticDispatcher->whatHappened($this->attacker, $this->defender);
+        $this->statisticDispatcher->damageDone($this->attacker, $damage);
 
-        if ($ifDefenderNotLucky) {
-            $this->statisticDispatcher->whatHappened($this->attacker, $this->defender);
-            $this->statisticDispatcher->damageDone($this->attacker, $damage);
+        $this->defender->setHealth($this->defender->getHealth() - $damage);
 
-            $this->defender->setHealth($this->defender->getHealth() - $damage);
-
-            $this->statisticDispatcher->defendersHealthLeft($this->defender);
-        }
+        $this->statisticDispatcher->defendersHealthLeft($this->defender);
     }
 
     public function setRoles(): void
@@ -142,7 +138,13 @@ class BattleManager
 
     public function defenderNotLucky(): bool
     {
-        return !$this->chanceManager->hadChance($this->defender->getLuck());
+        $notLucky = !$this->chanceManager->hadChance($this->defender->getLuck());
+
+        if(!$notLucky) {
+            $this->statisticDispatcher->defenderIsLucky($this->defender, $this->attacker);
+        }
+
+        return $notLucky;
     }
 
     public function attackerHasRapidStrike(): bool

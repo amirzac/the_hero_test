@@ -26,6 +26,10 @@ $battleManager = new BattleManager(
     $wildBeast
 );
 
-$statistic = $battleManager->battle();
+printStatistic($battleManager->battle()->getStatistic());
 
-print_r($statistic->getStatistic());
+function printStatistic(iterable $statistic){
+    foreach ($statistic as $statisticItem) {
+        echo $statisticItem . PHP_EOL;
+    }
+}

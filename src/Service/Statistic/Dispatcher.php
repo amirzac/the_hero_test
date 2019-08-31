@@ -49,6 +49,10 @@ class Dispatcher implements StatisticDispatcherInterface
         $this->addInfoToStatistic(sprintf("%s used %s skill.", $participant->getName(), $skill->getTitle()));
     }
 
+    public function defenderIsLucky(ParticipantInterface $defender, ParticipantInterface $attacker) {
+        $this->addInfoToStatistic(sprintf("Defender %s is lucky, attacker %s lose his hit", $defender->getName(), $attacker->getName()));
+    }
+
     public function setWinner(?ParticipantInterface $participant): void
     {
         if ($participant instanceof ParticipantInterface) {

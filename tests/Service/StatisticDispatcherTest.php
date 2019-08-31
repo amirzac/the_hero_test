@@ -60,10 +60,15 @@ class StatisticDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->statisticDispatcher->skillWasUsed($this->hero, new Skill('Test', 10, 'test_skill'));
         $this->assertEquals('Round 2: Orderus used Test skill.', $this->statisticDispatcher->getStatisticByKey(3));
 
-        $this->assertEquals('Winner: Draw', $this->statisticDispatcher->getStatistic()['winner']);
+        $this->assertEquals('Winner: Draw', $this->statisticDispatcher->getStatisticByKey('winner'));
         $this->statisticDispatcher->setWinner($this->hero);
-        $this->assertEquals('Winner: Orderus', $this->statisticDispatcher->getStatistic()['winner']);
+        $this->assertEquals('Winner: Orderus', $this->statisticDispatcher->getStatisticByKey('winner'));
 
+        $this->statisticDispatcher->defenderIsLucky($this->hero, $this->antiHero);
+        $this->assertEquals(
+            'Round 2: Defender Orderus is lucky, attacker Wild Beast lose his hit',
+            $this->statisticDispatcher->getStatisticByKey(4)
+        );
 
         $this->assertEmpty($this->statisticDispatcher->getStatisticByKey('haveWinnerBeforeMaximumRounds'));
         $this->statisticDispatcher->haveWinnerBeforeMaximumRounds(true);
@@ -71,5 +76,6 @@ class StatisticDispatcherTest extends \PHPUnit\Framework\TestCase
             'We have a winner before the maximum number of rounds is reached',
             $this->statisticDispatcher->getStatisticByKey('haveWinnerBeforeMaximumRounds')
         );
+
     }
 }

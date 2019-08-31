@@ -23,6 +23,8 @@ interface StatisticDispatcherInterface
 
     public function haveWinnerBeforeMaximumRounds(bool $value): void;
 
+    public function defenderIsLucky(ParticipantInterface $defender, ParticipantInterface $attacker);
+
     public function getStatistic(): iterable;
 
     public function getStatisticByKey($key);
