@@ -28,12 +28,12 @@ abstract class Participant implements ParticipantInterface
         $this->name = $name;
     }
 
-    public function getHealth(): int
+    public function getHealth(): float
     {
         return $this->health;
     }
 
-    public function setHealth(int $health): void
+    public function setHealth(float $health): void
     {
         $this->health = $health;
     }

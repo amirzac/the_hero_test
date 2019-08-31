@@ -8,9 +8,9 @@ interface ParticipantInterface
 
     public function setName(string $name): void;
 
-    public function getHealth(): int;
+    public function getHealth(): float ;
 
-    public function setHealth(int $health): void;
+    public function setHealth(float $health): void;
 
     public function getStrength(): int;
 

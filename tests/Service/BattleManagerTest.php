@@ -127,4 +127,23 @@ class BattleManagerTest extends \PHPUnit\Framework\TestCase
         $this->battleManager->getDefender()->getSkill('magic_shield')->setChance(0);
         $this->assertFalse($this->battleManager->defenderHasMagicShield());
     }
+
+    public function test_healthFloatValue()
+    {
+        $this->hero->setSpeed(2);
+        $this->antiHero->setSpeed(22);
+        $this->battleManager->setRoles();
+
+        $this->battleManager->getDefender()->getSkill('magic_shield')->setChance(100);
+
+        $this->battleManager->getAttacker()->setStrength(25);
+        $this->battleManager->getDefender()->setDefence(20);
+        $this->battleManager->getDefender()->setHealth(5);
+
+        $this->assertEquals(2.5, $this->battleManager->calculateDamage());
+
+        $this->battleManager->hitDefender($this->battleManager->calculateDamage());
+
+        $this->assertEquals(2.5, $this->battleManager->getDefender()->getHealth());
+    }
 }
