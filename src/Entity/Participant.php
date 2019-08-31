@@ -81,7 +81,7 @@ abstract class Participant implements ParticipantInterface
     public function addSkill(Skill $skill): void
     {
         if (isset($this->skills[$skill->getCodeName()])) {
-            throw new \LogicException('Skill is already exist');
+            throw new \LogicException('Skill already exist');
         }
 
         $this->skills[$skill->getCodeName()] = $skill;
@@ -108,5 +108,10 @@ abstract class Participant implements ParticipantInterface
     public function getSkills(): iterable
     {
         return $this->skills;
+    }
+
+    public function died():bool
+    {
+        return $this->health <= 0;
     }
 }

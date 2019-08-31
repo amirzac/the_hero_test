@@ -7,7 +7,9 @@ use app\Entity\Skill;
 
 interface StatisticDispatcherInterface
 {
-    public function setTurn(int $turn): void;
+    public function setRound(int $round): void;
+
+    public function getRound(): int;
 
     public function whatHappened(ParticipantInterface $attacker, ParticipantInterface $defender): void;
 
@@ -21,5 +23,7 @@ interface StatisticDispatcherInterface
 
     public function haveWinnerBeforeMaximumRounds(bool $value): void;
 
-    public function showStatistic(): void;
+    public function getStatistic(): iterable;
+
+    public function getStatisticByKey($key);
 }

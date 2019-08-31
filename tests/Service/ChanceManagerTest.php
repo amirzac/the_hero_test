@@ -1,19 +1,19 @@
 <?php
 
-use app\Service\Chance\Manager;
+use app\Service\Chance\Manager as ChanceManager;
 
-class ChanceManagerTest extends PHPUnit_Framework_TestCase
+class ChanceManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \app\Service\Chance\ChanceManagerInterface
      */
     private $chanceManager;
 
-    public function setUp()
+    public function setUp():void
     {
         $faker = Faker\Factory::create();
 
-        $this->chanceManager = new Manager($faker);
+        $this->chanceManager = new ChanceManager($faker);
     }
 
     public function test_hasChance()
@@ -28,12 +28,12 @@ class ChanceManagerTest extends PHPUnit_Framework_TestCase
 
     public function test_random()
     {
-        $this->assertInternalType('boolean', $this->chanceManager->hadChance(50));
+        $this->assertIsBool($this->chanceManager->hadChance(50));
     }
 
     public function test_wrong_attribute_exception()
     {
-        $this->setExpectedException(TypeError::class);
+        $this->expectException(TypeError::class);
 
         $this->chanceManager->hadChance('node valid attribute');
     }

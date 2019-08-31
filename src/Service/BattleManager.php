@@ -49,7 +49,7 @@ class BattleManager
         $this->antiHero = $antiHero;
         $this->statisticDispatcher = $statisticDispatcher;
 
-        $this->statisticDispatcher->setTurn($this->round);
+        $this->statisticDispatcher->setRound($this->round);
     }
 
     public function battle(): StatisticDispatcherInterface
@@ -66,14 +66,14 @@ class BattleManager
                 $this->hitDefender($this->calculateDamage());
             }
 
-            $this->finishTurn();
+            $this->finishRound();
             $this->switchRoles();
         }
 
         return $this->statisticDispatcher;
     }
 
-    private function hitDefender(float $damage): void
+    public function hitDefender(float $damage): void
     {
         $ifDefenderNotLucky = !$this->chanceManager->hadChance($this->defender->getLuck());
 
@@ -87,7 +87,7 @@ class BattleManager
         }
     }
 
-    private function setRoles(): void
+    public function setRoles(): void
     {
         //comparing speed
         $this->compareResultManager->setComparedValue($this->hero->getSpeed() <=> $this->antiHero->getSpeed());
@@ -98,6 +98,81 @@ class BattleManager
                 throw new \LogicException('Unsupported occasion. Lucky is equal');
             });
         });
+    }
+
+    public function switchRoles(): void
+    {
+        $temp = $this->defender;
+        $this->defender = $this->attacker;
+        $this->attacker = $temp;
+    }
+
+    public function calculateDamage(): float
+    {
+        $damage = ($this->attacker->getStrength() - $this->defender->getDefence());
+        if ($this->defenderHasMagicShield()) {
+            $damage = round($damage / 2, 1);
+        }
+
+        return $damage;
+    }
+
+    public function getAttacker():ParticipantInterface
+    {
+        return $this->attacker;
+    }
+
+    public function getDefender():ParticipantInterface
+    {
+        return $this->defender;
+    }
+
+    public function getWinner(): ?ParticipantInterface
+    {
+        $this->compareResultManager->setComparedValue($this->attacker->getHealth() <=> $this->defender->getHealth());
+
+        if ($this->compareResultManager->isMore()) {
+            return $this->attacker;
+        } elseif ($this->compareResultManager->isLess()) {
+            return $this->defender;
+        } else {
+            return null;
+        }
+    }
+
+    public function defenderNotLucky(): bool
+    {
+        return !$this->chanceManager->hadChance($this->defender->getLuck());
+    }
+
+    public function attackerHasRapidStrike(): bool
+    {
+        return $this->skillActive($this->attacker, 'rapid_strike');
+    }
+
+    public function defenderHasMagicShield(): bool
+    {
+        return $this->skillActive($this->defender, 'magic_shield');
+    }
+
+    public function canContinueBattle(): bool
+    {
+        $continue = true;
+
+        if ($this->round >= self::MAX_TURNS) {
+            $continue = false;
+        }
+
+        if ($this->attacker->died() || $this->defender->died()) {
+            $continue = false;
+            $this->statisticDispatcher->haveWinnerBeforeMaximumRounds(1);
+        }
+
+        if (!$continue) {
+            $this->statisticDispatcher->setWinner($this->getWinner());
+        }
+
+        return $continue;
     }
 
     private function setRolesInCondition(callable $function): void
@@ -113,80 +188,10 @@ class BattleManager
         }
     }
 
-    private function switchRoles(): void
-    {
-        $temp = $this->defender;
-        $this->defender = $this->attacker;
-        $this->attacker = $temp;
-    }
-
-    private function calculateDamage(): float
-    {
-        $damage = ($this->attacker->getStrength() - $this->defender->getDefence());
-        if ($this->defenderHasMagicShield()) {
-            $damage = round($damage / 2, 1);
-        }
-
-        return $damage;
-    }
-
-    private function defenderNotLucky(): bool
-    {
-        return !$this->chanceManager->hadChance($this->defender->getLuck());
-    }
-
-    private function attackerHasRapidStrike(): bool
-    {
-        return $this->skillActive($this->attacker, 'rapid_strike');
-    }
-
-    private function defenderHasMagicShield(): bool
-    {
-        return $this->skillActive($this->defender, 'magic_shield');
-    }
-
-    private function canContinueBattle(): bool
-    {
-        $continue = true;
-
-        if ($this->round >= self::MAX_TURNS) {
-            $continue = false;
-        }
-
-        if ($this->participantDie($this->attacker) || $this->participantDie($this->defender)) {
-            $continue = false;
-            $this->statisticDispatcher->haveWinnerBeforeMaximumRounds(1);
-        }
-
-        if (!$continue) {
-            $this->statisticDispatcher->setWinner($this->getWinner());
-        }
-
-        return $continue;
-    }
-
-    private function getWinner(): ?ParticipantInterface
-    {
-        $this->compareResultManager->setComparedValue($this->attacker->getHealth() <=> $this->defender->getHealth());
-
-        if ($this->compareResultManager->isMore()) {
-            return $this->attacker;
-        } elseif ($this->compareResultManager->isLess()) {
-            return $this->defender;
-        } else {
-            return null;
-        }
-    }
-
-    private function participantDie(ParticipantInterface $participant): bool
-    {
-        return ($participant->getHealth() <= 0);
-    }
-
-    private function finishTurn(): void
+    private function finishRound(): void
     {
         $this->round++;
-        $this->statisticDispatcher->setTurn($this->round);
+        $this->statisticDispatcher->setRound($this->round);
     }
 
     private function skillActive(ParticipantInterface $participant, string $codeName): bool

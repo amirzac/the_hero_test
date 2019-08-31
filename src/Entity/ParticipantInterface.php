@@ -32,6 +32,8 @@ interface ParticipantInterface
 
     public function removeSkill(Skill $skill): void;
 
+    public function died():bool;
+
     public function getSkill(string $codeName): Skill;
 
     /**

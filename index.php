@@ -28,4 +28,4 @@ $battleManager = new BattleManager(
 
 $statistic = $battleManager->battle();
 
-$statistic->showStatistic();
+print_r($statistic->getStatistic());

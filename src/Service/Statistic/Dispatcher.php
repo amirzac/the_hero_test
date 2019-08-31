@@ -15,13 +15,18 @@ class Dispatcher implements StatisticDispatcherInterface
 
     private $haveWinnerBeforeMaximumRounds = false;
 
-    private $turn;
+    private $round = 1;
 
     private $statisticReport = [];
 
-    public function setTurn(int $turn): void
+    public function setRound(int $round): void
     {
-        $this->turn = $turn;
+        $this->round = $round;
+    }
+
+    public function getRound():int
+    {
+        return $this->round;
     }
 
     public function whatHappened(ParticipantInterface $attacker, ParticipantInterface $defender): void
@@ -49,7 +54,6 @@ class Dispatcher implements StatisticDispatcherInterface
         if ($participant instanceof ParticipantInterface) {
             $this->winner = $participant;
         }
-
     }
 
     public function haveWinnerBeforeMaximumRounds(bool $value): void
@@ -57,21 +61,30 @@ class Dispatcher implements StatisticDispatcherInterface
         $this->haveWinnerBeforeMaximumRounds = $value;
     }
 
-    public function showStatistic(): void
+    public function getStatistic(): iterable
     {
-        $this->statisticReport = array_merge($this->statisticReport, ['Winner' => $this->winner->getName() ?? 'Draw']);
+        $this->statisticReport['winner'] = sprintf("Winner: %s", $this->getWinnerName());
 
         if ($this->haveWinnerBeforeMaximumRounds) {
-            $this->statisticReport = array_merge($this->statisticReport, [
-                'haveWinnerBeforeMaximumRounds' => 'We have a winner before the maximum number of rounds is reached'
-            ]);
+            $this->statisticReport['haveWinnerBeforeMaximumRounds'] = 'We have a winner before the maximum number of rounds is reached';
         }
 
-        print_r($this->statisticReport);
+        return $this->statisticReport;
+    }
+
+    public function getStatisticByKey($key)
+    {
+        $statistic = $this->getStatistic();
+        return $statistic[$key] ?? null;
     }
 
     private function addInfoToStatistic(string $info): void
     {
-        $this->statisticReport[$this->turn][] = $info;
+        $this->statisticReport[] = sprintf("Round %s: %s", $this->round, $info);
+    }
+
+    private function getWinnerName():string
+    {
+        return ($this->winner instanceof ParticipantInterface) ? $this->winner->getName() : 'Draw';
     }
 }
