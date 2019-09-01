@@ -146,4 +146,14 @@ class BattleManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(2.5, $this->battleManager->getDefender()->getHealth());
     }
+
+    public function test_WinnerNotFound()
+    {
+        $this->hero->setHealth(10);
+        $this->antiHero->setHealth(10);
+
+        $this->battleManager->setRoles();
+        $this->expectException(LogicException::class);
+        $this->battleManager->getWinner();
+    }
 }

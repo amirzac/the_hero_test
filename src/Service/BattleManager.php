@@ -66,8 +66,8 @@ class BattleManager
                 $this->hitDefender($this->calculateDamage());
             }
 
-            $this->switchRoles();
             $this->finishRound();
+            $this->switchRoles();
         }
 
         return $this->statisticDispatcher;
@@ -123,7 +123,7 @@ class BattleManager
         return $this->defender;
     }
 
-    public function getWinner(): ?ParticipantInterface
+    public function getWinner():ParticipantInterface
     {
         $this->compareResultManager->setComparedValue($this->attacker->getHealth() <=> $this->defender->getHealth());
 
@@ -131,9 +131,9 @@ class BattleManager
             return $this->attacker;
         } elseif ($this->compareResultManager->isLess()) {
             return $this->defender;
-        } else {
-            return null;
         }
+
+        throw new \LogicException("Winner hasn't been found");
     }
 
     public function defenderNotLucky(): bool
@@ -171,7 +171,11 @@ class BattleManager
         }
 
         if (!$continue) {
-            $this->statisticDispatcher->setWinner($this->getWinner());
+            try {
+                $this->statisticDispatcher->setWinnerName($this->getWinner()->getName());
+            } catch (\LogicException $e) {
+                $this->statisticDispatcher->setWinnerName('Draw');
+            }
         }
 
         return $continue;

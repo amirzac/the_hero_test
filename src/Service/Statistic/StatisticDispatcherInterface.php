@@ -19,7 +19,7 @@ interface StatisticDispatcherInterface
 
     public function skillWasUsed(ParticipantInterface $participant, Skill $skill): void;
 
-    public function setWinner(?ParticipantInterface $participant): void;
+    public function setWinnerName(string $winnerName): void;
 
     public function haveWinnerBeforeMaximumRounds(bool $value): void;
 

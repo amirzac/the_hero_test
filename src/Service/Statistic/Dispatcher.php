@@ -7,11 +7,7 @@ use app\Entity\Skill;
 
 class Dispatcher implements StatisticDispatcherInterface
 {
-
-    /**
-     * @var ParticipantInterface
-     */
-    private $winner;
+    private $winnerName;
 
     private $haveWinnerBeforeMaximumRounds = false;
 
@@ -53,42 +49,34 @@ class Dispatcher implements StatisticDispatcherInterface
         $this->addInfoToStatistic(sprintf("Defender %s is lucky, attacker %s lose his hit", $defender->getName(), $attacker->getName()));
     }
 
-    public function setWinner(?ParticipantInterface $participant): void
+    public function setWinnerName(string $winnerName): void
     {
-        if ($participant instanceof ParticipantInterface) {
-            $this->winner = $participant;
-        }
+        $this->winnerName = $winnerName;
+        $this->statisticReport['winnerName'] = sprintf("Winner: %s", $this->winnerName);
     }
 
     public function haveWinnerBeforeMaximumRounds(bool $value): void
     {
         $this->haveWinnerBeforeMaximumRounds = $value;
+        if($value) {
+            $this->statisticReport['haveWinnerBeforeMaximumRounds'] = 'We have a winner before the maximum number of rounds is reached';
+        } else {
+            unset($this->statisticReport['haveWinnerBeforeMaximumRounds']);
+        }
     }
 
     public function getStatistic(): iterable
     {
-        $this->statisticReport['winner'] = sprintf("Winner: %s", $this->getWinnerName());
-
-        if ($this->haveWinnerBeforeMaximumRounds) {
-            $this->statisticReport['haveWinnerBeforeMaximumRounds'] = 'We have a winner before the maximum number of rounds is reached';
-        }
-
         return $this->statisticReport;
     }
 
     public function getStatisticByKey($key)
     {
-        $statistic = $this->getStatistic();
-        return $statistic[$key] ?? null;
+        return $this->statisticReport[$key] ?? null;
     }
 
     private function addInfoToStatistic(string $info): void
     {
         $this->statisticReport[] = sprintf("Round %s: %s", $this->round, $info);
-    }
-
-    private function getWinnerName():string
-    {
-        return ($this->winner instanceof ParticipantInterface) ? $this->winner->getName() : 'Draw';
     }
 }

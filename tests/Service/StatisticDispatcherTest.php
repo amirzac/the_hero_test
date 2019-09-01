@@ -44,12 +44,15 @@ class StatisticDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function test_whatHappened()
     {
+        //what happened
         $this->statisticDispatcher->whatHappened($this->hero, $this->antiHero);
         $this->assertEquals('Round 1: Orderus hit Wild Beast.', $this->statisticDispatcher->getStatisticByKey(0));
 
+        //damage
         $this->statisticDispatcher->damageDone($this->antiHero, 99);
         $this->assertEquals('Round 1: Wild Beast has done 99 damage.', $this->statisticDispatcher->getStatisticByKey(1));
 
+        //health
         $this->statisticDispatcher->setRound(2);
         $this->statisticDispatcher->defendersHealthLeft($this->hero);
         $this->assertEquals(
@@ -57,19 +60,24 @@ class StatisticDispatcherTest extends \PHPUnit\Framework\TestCase
             $this->statisticDispatcher->getStatisticByKey(2)
         );
 
+        //used skills
         $this->statisticDispatcher->skillWasUsed($this->hero, new Skill('Test', 10, 'test_skill'));
         $this->assertEquals('Round 2: Orderus used Test skill.', $this->statisticDispatcher->getStatisticByKey(3));
 
-        $this->assertEquals('Winner: Draw', $this->statisticDispatcher->getStatisticByKey('winner'));
-        $this->statisticDispatcher->setWinner($this->hero);
-        $this->assertEquals('Winner: Orderus', $this->statisticDispatcher->getStatisticByKey('winner'));
+        //winner name
+        $this->statisticDispatcher->setWinnerName('Draw');
+        $this->assertEquals('Winner: Draw', $this->statisticDispatcher->getStatisticByKey('winnerName'));
+        $this->statisticDispatcher->setWinnerName($this->hero->getName());
+        $this->assertEquals('Winner: Orderus', $this->statisticDispatcher->getStatisticByKey('winnerName'));
 
+        //defender is lucky
         $this->statisticDispatcher->defenderIsLucky($this->hero, $this->antiHero);
         $this->assertEquals(
             'Round 2: Defender Orderus is lucky, attacker Wild Beast lose his hit',
             $this->statisticDispatcher->getStatisticByKey(4)
         );
 
+        //max rounds
         $this->assertEmpty($this->statisticDispatcher->getStatisticByKey('haveWinnerBeforeMaximumRounds'));
         $this->statisticDispatcher->haveWinnerBeforeMaximumRounds(true);
         $this->assertEquals(
